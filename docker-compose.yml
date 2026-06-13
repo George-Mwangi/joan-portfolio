@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: joan_portfolio_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: joan
+      POSTGRES_PASSWORD: portfolio_secret
+      POSTGRES_DB: portfolio
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U joan -d portfolio']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: joan_portfolio_app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://joan:portfolio_secret@db:5432/portfolio
+      AUTH_SECRET: change-this-to-a-secure-random-string
+      AUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    env_file:
+      - .env.local
+
+volumes:
+  postgres_data:

@@ -1,0 +1,265 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  name      String?
+  role      Role       @default(ADMIN)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  auditLogs AuditLog[]
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Profile {
+  id              String   @id @default(cuid())
+  name            String
+  title           String[]
+  summary         String   @db.Text
+  email           String
+  phone           String?
+  location        String?
+  linkedinUrl     String?
+  githubUrl       String?
+  twitterUrl      String?
+  whatsappNumber  String?
+  profileImageUrl String?
+  faviconUrl      String?
+  logoUrl         String?
+  cvUrl           String?
+  cvFileName      String?
+  isPublished     Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Experience {
+  id           String    @id @default(cuid())
+  company      String
+  role         String
+  startDate    DateTime
+  endDate      DateTime?
+  isCurrent    Boolean   @default(false)
+  description  String?   @db.Text
+  achievements String[]
+  location     String?
+  order        Int       @default(0)
+  isPublished  Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([order])
+}
+
+model Education {
+  id          String    @id @default(cuid())
+  institution String
+  degree      String
+  field       String?
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean   @default(false)
+  grade       String?
+  description String?   @db.Text
+  order       Int       @default(0)
+  isPublished Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([order])
+}
+
+model Certification {
+  id            String    @id @default(cuid())
+  name          String
+  issuer        String
+  issueDate     DateTime?
+  expiryDate    DateTime?
+  credentialId  String?
+  credentialUrl String?
+  imageUrl      String?
+  order         Int       @default(0)
+  isPublished   Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([order])
+}
+
+model Skill {
+  id          String        @id @default(cuid())
+  name        String
+  category    SkillCategory
+  proficiency Int           @default(80)
+  order       Int           @default(0)
+  isPublished Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([category])
+  @@index([order])
+}
+
+enum SkillCategory {
+  CORE
+  TECHNICAL
+  SOFT
+  LANGUAGE
+}
+
+model Tool {
+  id          String       @id @default(cuid())
+  name        String
+  category    ToolCategory
+  iconUrl     String?
+  order       Int          @default(0)
+  isPublished Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([category])
+}
+
+enum ToolCategory {
+  CRM_SUPPORT
+  PRODUCTIVITY
+  PROJECT_MANAGEMENT
+  COMMUNICATION
+  ERP_ACCOUNTING
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  category    String?
+  imageUrl    String?
+  projectUrl  String?
+  tags        String[]
+  client      String?
+  startDate   DateTime?
+  endDate     DateTime?
+  isFeatured  Boolean  @default(false)
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+  @@index([isFeatured])
+}
+
+model Client {
+  id          String   @id @default(cuid())
+  name        String
+  industry    String?
+  logoUrl     String?
+  websiteUrl  String?
+  description String?  @db.Text
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+}
+
+model Achievement {
+  id          String    @id @default(cuid())
+  title       String
+  description String    @db.Text
+  date        DateTime?
+  icon        String?
+  order       Int       @default(0)
+  isPublished Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Testimonial {
+  id             String   @id @default(cuid())
+  authorName     String
+  authorTitle    String?
+  authorCompany  String?
+  authorImageUrl String?
+  content        String   @db.Text
+  rating         Int      @default(5)
+  isPublished    Boolean  @default(false)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String        @db.Text
+  status    MessageStatus @default(UNREAD)
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model Resume {
+  id        String   @id @default(cuid())
+  version   String
+  fileUrl   String
+  fileName  String
+  fileSize  Int?
+  isActive  Boolean  @default(false)
+  downloads Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([resource])
+  @@index([createdAt])
+}
