@@ -51,7 +51,7 @@ export function ContactSection({ profile }: { profile: Profile | null }) {
         throw new Error(error.message || 'Failed to send message')
       }
 
-      toast.success('Message sent! Joan will get back to you soon. If Joan does not get back within 24 hours please email her directly on joanivymwangi@gmail.com ')
+      toast.success('Message sent! Joan will get back to you soon.')
       reset()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
