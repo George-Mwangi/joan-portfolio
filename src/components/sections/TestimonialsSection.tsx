@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import { motion } from 'motion/react'
 import { Quote, Star } from 'lucide-react'

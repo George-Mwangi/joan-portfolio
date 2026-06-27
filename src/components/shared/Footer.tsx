@@ -72,3 +72,4 @@ export function Footer({ profile }: { profile: Profile | null }) {
     </footer>
   )
 }
+//
