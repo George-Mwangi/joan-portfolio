@@ -24,26 +24,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
-        const parsed = loginSchema.safeParse(credentials)
-        if (!parsed.success) return null
+     async authorize(credentials) {
+      try{
+  const parsed = loginSchema.safeParse(credentials)
 
-        const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email },
-        })
+  if (!parsed.success) return null
 
-        if (!user) return null
+  const user = await prisma.user.findUnique({
+    where: {
+      email: parsed.data.email,
+    },
+  })
 
-        const isValid = await bcrypt.compare(parsed.data.password, user.password)
-        if (!isValid) return null
+  if (!user) return null
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        }
-      },
+  const isValid = await bcrypt.compare(
+    parsed.data.password,
+    user.password
+  )
+
+  if (!isValid) return null
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  }
+} catch (error) {
+  console.error("Authentcation error:")
+  return null
+}
+},
     }),
   ],
   callbacks: {
