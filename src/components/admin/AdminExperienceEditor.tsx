@@ -4,10 +4,44 @@ import { useState } from 'react'
 import { Plus, Trash2, Edit3, Calendar, Building2 } from 'lucide-react'
 import { formatDateRange } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { AdminModal } from './AdminModal'
+
+import { ExperienceForm } from './ExperienceForm'
 
 export function AdminExperienceEditor({ experiences: initial }: { experiences: any[] }) {
   const [experiences, setExperiences] = useState(initial)
-  const [deleting, setDeleting] = useState<string | null>(null)
+const [deleting, setDeleting] = useState<string | null>(null)
+
+const [dialogOpen, setDialogOpen] = useState(false)
+const [editingExperience, setEditingExperience] = useState<any | null>(null)
+
+const handleAdd = () => {
+  setEditingExperience(null)
+  setDialogOpen(true)
+}
+
+const handleEdit = (experience: any) => {
+  setEditingExperience(experience)
+  setDialogOpen(true)
+}
+
+const handleSaved = (saved: any) => {
+  setExperiences((prev) => {
+    const exists = prev.some((e) => e.id === saved.id)
+
+    if (exists) {
+      return prev.map((e) =>
+        e.id === saved.id ? saved : e
+      )
+    }
+
+    return [...prev, saved].sort(
+      (a, b) => a.order - b.order
+    )
+  })
+
+  setDialogOpen(false)
+}
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this experience entry?')) return
@@ -28,7 +62,7 @@ export function AdminExperienceEditor({ experiences: initial }: { experiences: a
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-display font-bold text-foreground">Work Experience</h2>
-        <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all">
+        <button onClick={handleAdd} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all">
           <Plus className="w-4 h-4" />
           Add Experience
         </button>
@@ -54,7 +88,7 @@ export function AdminExperienceEditor({ experiences: initial }: { experiences: a
               </div>
             </div>
             <div className="flex gap-2 flex-shrink-0">
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+              <button  onClick={() => handleEdit(exp)} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
                 <Edit3 className="w-4 h-4" />
               </button>
               <button
@@ -74,6 +108,21 @@ export function AdminExperienceEditor({ experiences: initial }: { experiences: a
           </div>
         )}
       </div>
+      <AdminModal
+    open={dialogOpen}
+    onClose={() => setDialogOpen(false)}
+    title={
+        editingExperience
+            ? 'Edit Experience'
+            : 'Add Experience'
+    }
+>
+   <ExperienceForm
+        experience={editingExperience}
+        onSaved={handleSaved}
+        onCancel={() => setDialogOpen(false)}
+    />
+</AdminModal>
     </div>
   )
 }
