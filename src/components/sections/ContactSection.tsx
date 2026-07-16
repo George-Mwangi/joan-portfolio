@@ -99,7 +99,7 @@ export function ContactSection({ profile }: { profile: Profile | null }) {
             Contact Me
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Open to procurement, logistics, and customer service opportunities across Kenya.
+            Open to procurement, logistics, and customer service opportunities across the Globe.
             Reach out and let's talk.
           </p>
         </motion.div>
